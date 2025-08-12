@@ -1,0 +1,319 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enum para países soportados
+enum Country {
+  BR // Brasil
+  MX // México
+  AR // Argentina
+  CO // Colombia
+  CL // Chile
+  US // Estados Unidos
+  CA // Canadá
+  PE // Perú
+}
+
+// Enum para estados de órdenes de trabajo
+enum WorkOrderStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  TERMINATED
+}
+
+// Enum para tipos de empleado
+enum EmployeeType {
+  FULL_TIME
+  PART_TIME
+  CONTRACTOR
+  TEMPORARY
+}
+
+// Enum para estados de procesamiento de nómina
+enum PayrollStatus {
+  DRAFT
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+// Enum para tipos de organización
+enum OrganizationType {
+  CORPORATION
+  SME
+  STARTUP
+  NGO
+  GOVERNMENT
+}
+
+// Configuración específica por país
+model CountryConfiguration {
+  id              String   @id @default(uuid())
+  country         Country  @unique
+  name            String
+  currency        String
+  locale          String
+  timezone        String
+  taxSystem       Json     // Configuración de impuestos específica del país
+  laborLaws       Json     // Leyes laborales del país
+  holidayCalendar Json     // Calendario de días festivos
+  minimumWage     Decimal  @db.Decimal(12, 2)
+  workingHours    Int      @default(40) // Horas semanales estándar
+  overtimeRules   Json     // Reglas de horas extra
+  socialSecurity  Json     // Configuración de seguridad social
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relaciones
+  organizations   Organization[]
+
+  @@map("country_configurations")
+}
+
+// Modelo de Organización
+model Organization {
+  id                String             @id @default(uuid())
+  name              String
+  code              String             @unique
+  type              OrganizationType
+  countryId         String
+  country           CountryConfiguration @relation(fields: [countryId], references: [id])
+  taxId             String?            // RUT, CNPJ, RFC, etc.
+  address           Json?              // Dirección completa
+  configuration     Json               // Configuración específica de la organización
+  isActive          Boolean            @default(true)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  // Relaciones
+  employers         Employer[]
+  users             User[]
+
+  @@index([countryId])
+  @@index([type])
+  @@map("organizations")
+}
+
+// Modelo de Empleador (dentro de una organización)
+model Employer {
+  id              String       @id @default(uuid())
+  name            String
+  code            String
+  organizationId  String
+  organization    Organization @relation(fields: [organizationId], references: [id])
+  legalName       String?      // Razón social
+  taxId           String?      // Registro tributario específico
+  configuration   Json         // Configuración específica del empleador
+  isActive        Boolean      @default(true)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  // Relaciones
+  workOrders      WorkOrder[]
+  departments     Department[]
+
+  @@unique([organizationId, code])
+  @@index([organizationId])
+  @@map("employers")
+}
+
+// Modelo de Orden de Trabajo (para cálculo de nómina)
+model WorkOrder {
+  id              String          @id @default(uuid())
+  code            String
+  name            String
+  description     String?
+  employerId      String
+  employer        Employer        @relation(fields: [employerId], references: [id])
+  payrollPeriod   String          // MONTHLY, BIWEEKLY, WEEKLY
+  configuration   Json            // Configuración específica de la orden de trabajo
+  status          WorkOrderStatus @default(ACTIVE)
+  startDate       DateTime
+  endDate         DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  // Relaciones
+  employees       Employee[]
+  payrollRuns     PayrollRun[]
+  bankAccounts    BankAccount[]
+
+  @@unique([employerId, code])
+  @@index([employerId])
+  @@index([status])
+  @@map("work_orders")
+}
+
+// Modelo de Usuario (para autenticación y autorización)
+model User {
+  id              String       @id @default(uuid())
+  email           String       @unique
+  password        String
+  name            String
+  role            String        @default("USER") // SUPER_ADMIN, ORG_ADMIN, EMPLOYER_ADMIN, USER
+  isActive        Boolean       @default(true)
+  organizationId  String?       // Opcional para SUPER_ADMIN
+  organization    Organization? @relation(fields: [organizationId], references: [id])
+  permissions     Json?         // Permisos específicos del usuario
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([organizationId])
+  @@index([role])
+  @@map("users")
+}
+
+// Modelo de Departamento
+model Department {
+  id              String     @id @default(uuid())
+  name            String
+  code            String
+  description     String?
+  employerId      String
+  employer        Employer   @relation(fields: [employerId], references: [id])
+  employees       Employee[]
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  @@unique([employerId, code])
+  @@index([employerId])
+  @@map("departments")
+}
+
+// Modelo de Empleado
+model Employee {
+  id              String        @id @default(uuid())
+  employeeCode    String
+  firstName       String
+  lastName        String
+  email           String
+  documentType    String
+  documentNumber  String
+  type            EmployeeType
+  hireDate        DateTime
+  terminationDate DateTime?
+  salary          Decimal       @db.Decimal(12, 2)
+  currency        String        @default("BRL")
+  position        String
+  departmentId    String
+  department      Department    @relation(fields: [departmentId], references: [id])
+  workOrderId     String
+  workOrder       WorkOrder     @relation(fields: [workOrderId], references: [id])
+  
+  // Información adicional
+  metadata        Json?         // Información adicional específica del empleado
+  benefits        Json?         // Beneficios específicos del empleado
+  
+  // Relaciones
+  payrollItems    PayrollItem[]
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@unique([workOrderId, employeeCode])
+  @@unique([workOrderId, documentNumber])
+  @@index([workOrderId])
+  @@index([departmentId])
+  @@index([type])
+  @@map("employees")
+}
+
+// Modelo de Cuenta Bancaria
+model BankAccount {
+  id              String        @id @default(uuid())
+  bankCode        String
+  bankName        String
+  accountType     String        // CHECKING, SAVINGS, etc.
+  accountNumber   String
+  routingNumber   String?       // Para bancos en US
+  swiftCode       String?       // Para transferencias internacionales
+  clabe           String?       // Para México
+  agency          String?       // Para Brasil
+  workOrderId     String
+  workOrder       WorkOrder     @relation(fields: [workOrderId], references: [id])
+  isActive        Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@unique([workOrderId, accountNumber])
+  @@index([workOrderId])
+  @@map("bank_accounts")
+}
+
+// Modelo de Ejecución de Nómina
+model PayrollRun {
+  id              String        @id @default(uuid())
+  runNumber       String
+  period          String
+  startDate       DateTime
+  endDate         DateTime
+  status          PayrollStatus @default(DRAFT)
+  totalEmployees  Int           @default(0)
+  totalGross      Decimal       @db.Decimal(15, 2) @default(0)
+  totalNet        Decimal       @db.Decimal(15, 2) @default(0)
+  totalTaxes      Decimal       @db.Decimal(15, 2) @default(0)
+  totalDeductions Decimal       @db.Decimal(15, 2) @default(0)
+  currency        String        @default("BRL")
+  
+  workOrderId     String
+  workOrder       WorkOrder     @relation(fields: [workOrderId], references: [id])
+  
+  // Metadata de procesamiento
+  processingData  Json?
+  errors          Json?
+  
+  // Relaciones
+  payrollItems    PayrollItem[]
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  processedAt     DateTime?
+
+  @@unique([workOrderId, runNumber])
+  @@index([workOrderId])
+  @@index([status])
+  @@map("payroll_runs")
+}
+
+// Modelo de Item de Nómina (detalle por empleado)
+model PayrollItem {
+  id              String       @id @default(uuid())
+  payrollRunId    String
+  payrollRun      PayrollRun   @relation(fields: [payrollRunId], references: [id])
+  employeeId      String
+  employee        Employee     @relation(fields: [employeeId], references: [id])
+  
+  // Montos
+  grossSalary     Decimal      @db.Decimal(12, 2)
+  netSalary       Decimal      @db.Decimal(12, 2)
+  totalTaxes      Decimal      @db.Decimal(12, 2)
+  totalDeductions Decimal      @db.Decimal(12, 2)
+  totalBenefits   Decimal      @db.Decimal(12, 2)
+  
+  // Detalle de cálculos
+  calculations    Json
+  
+  // Estado
+  isPaid          Boolean      @default(false)
+  paidAt          DateTime?
+  paymentMethod   String?
+  paymentRef      String?
+  
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@unique([payrollRunId, employeeId])
+  @@index([payrollRunId])
+  @@index([employeeId])
+  @@map("payroll_items")
+}
