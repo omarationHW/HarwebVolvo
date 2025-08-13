@@ -35,6 +35,26 @@ export default function RegisterPage() {
     taxId: ''
   })
 
+  // Animated background particles
+  useEffect(() => {
+    const createParticle = () => {
+      const particle = document.createElement('div')
+      particle.className = 'particle'
+      particle.style.left = Math.random() * 100 + '%'
+      particle.style.animationDelay = Math.random() * 5 + 's'
+      particle.style.animationDuration = 15 + Math.random() * 10 + 's'
+      
+      const bgAnimation = document.querySelector('.bg-animation')
+      if (bgAnimation) {
+        bgAnimation.appendChild(particle)
+        setTimeout(() => particle.remove(), 25000)
+      }
+    }
+
+    const interval = setInterval(createParticle, 2000)
+    return () => clearInterval(interval)
+  }, [])
+
   const countries = [
     { code: 'BR', name: 'Brasil', flag: '🇧🇷', currency: 'BRL', timezone: 'America/Sao_Paulo' },
     { code: 'MX', name: 'México', flag: '🇲🇽', currency: 'MXN', timezone: 'America/Mexico_City' },
@@ -101,35 +121,36 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-indigo-600 via-purple-700 to-pink-600">
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <Header />
       
       {/* Animated Background */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-pink-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      <div className="bg-animation absolute inset-0">
+        <div className="particle absolute w-2 h-2 bg-slate-400/20 rounded-full" />
+        <div className="particle absolute w-3 h-3 bg-slate-400/10 rounded-full" />
+        <div className="particle absolute w-2 h-2 bg-slate-400/15 rounded-full" />
       </div>
 
       {/* Pattern overlay */}
       <div className="absolute inset-0" style={{
-        backgroundImage: `radial-gradient(circle at 1px 1px, rgb(255 255 255 / 0.1) 1px, transparent 1px)`,
+        backgroundImage: `radial-gradient(circle at 1px 1px, rgb(148 163 184 / 0.1) 1px, transparent 1px)`,
         backgroundSize: '50px 50px'
       }} />
 
       {/* Content */}
-      <div className="relative min-h-screen flex items-center justify-center p-4 sm:p-8 pt-24">
-        <div className="w-full max-w-5xl grid lg:grid-cols-2 gap-8 lg:gap-12">
-          {/* Left Panel - Form */}
-          <div className="order-2 lg:order-1">
+      <div className="relative min-h-screen flex pt-20">
+        {/* Left Panel - Form */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+          <div className="w-full max-w-md">
 
             {/* Form Container */}
-            <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/20">
-              <div className="mb-6">
-                <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
-                  {step === 1 ? 'Información de la Empresa' : 'Información Personal'}
+            <div className="bg-slate-800/80 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-slate-700">
+              <div className="text-center mb-8">
+                <h1 className="text-3xl font-bold text-white mb-2">
+                  {step === 1 ? 'Registra tu Empresa' : 'Crea tu Cuenta'}
                 </h1>
                 <p className="text-white/80">
-                  {step === 1 ? 'Paso 1 de 2: Datos de tu organización' : 'Paso 2 de 2: Crea tu cuenta de administrador'}
+                  {step === 1 ? 'Paso 1 de 2: Datos de tu organización' : 'Paso 2 de 2: Información del administrador'}
                 </p>
               </div>
 
@@ -137,24 +158,24 @@ export default function RegisterPage() {
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center flex-1">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-                    step >= 1 ? 'bg-white text-purple-700' : 'bg-white/20 text-white/50'
+                    step >= 1 ? 'bg-slate-900 text-white border-2 border-slate-600' : 'bg-slate-700/50 text-slate-400'
                   }`}>
                     1
                   </div>
                   <div className={`flex-1 h-1 mx-2 ${
-                    step >= 2 ? 'bg-white' : 'bg-white/20'
+                    step >= 2 ? 'bg-slate-600' : 'bg-slate-700/50'
                   }`} />
                 </div>
                 <div className="flex items-center">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-                    step >= 2 ? 'bg-white text-purple-700' : 'bg-white/20 text-white/50'
+                    step >= 2 ? 'bg-slate-900 text-white border-2 border-slate-600' : 'bg-slate-700/50 text-slate-400'
                   }`}>
                     2
                   </div>
                 </div>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleSubmit} className="space-y-6">
                 {error && (
                   <div className="bg-red-500/20 border border-red-500/50 text-white p-4 rounded-xl text-sm backdrop-blur-sm">
                     {error}
@@ -176,8 +197,8 @@ export default function RegisterPage() {
                             onClick={() => setFormData({ ...formData, country: country.code })}
                             className={`p-3 rounded-xl border transition-all ${
                               formData.country === country.code
-                                ? 'bg-white/20 border-white/50 shadow-lg'
-                                : 'bg-white/5 border-white/20 hover:bg-white/10'
+                                ? 'bg-slate-700 border-slate-500 shadow-lg'
+                                : 'bg-slate-700/50 border-slate-600 hover:bg-slate-700/70'
                             }`}
                           >
                             <div className="text-2xl mb-1">{country.flag}</div>
@@ -198,7 +219,7 @@ export default function RegisterPage() {
                           placeholder="Grupo Empresarial ABC"
                           value={formData.organizationName}
                           onChange={(e) => setFormData({ ...formData, organizationName: e.target.value })}
-                          className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all duration-200"
+                          className="w-full pl-10 pr-4 py-3 bg-slate-700/50 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200"
                         />
                       </div>
                     </div>
@@ -215,7 +236,7 @@ export default function RegisterPage() {
                           required
                           value={formData.employerName}
                           onChange={(e) => setFormData({ ...formData, employerName: e.target.value })}
-                          className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all duration-200"
+                          className="w-full pl-10 pr-4 py-3 bg-slate-700/50 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200"
                         />
                       </div>
                     </div>
@@ -228,10 +249,10 @@ export default function RegisterPage() {
                         id="organizationType"
                         value={formData.organizationType}
                         onChange={(e) => setFormData({ ...formData, organizationType: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all duration-200"
+                        className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200"
                       >
                         {organizationTypes.map((type) => (
-                          <option key={type.value} value={type.value} className="bg-purple-800">
+                          <option key={type.value} value={type.value} className="bg-slate-800">
                             {type.label}
                           </option>
                         ))}
@@ -247,7 +268,7 @@ export default function RegisterPage() {
                         placeholder="ABC123456789"
                         value={formData.taxId}
                         onChange={(e) => setFormData({ ...formData, taxId: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all duration-200"
+                        className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200"
                       />
                     </div>
                   </>
@@ -266,7 +287,7 @@ export default function RegisterPage() {
                           required
                           value={formData.name}
                           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all duration-200"
+                          className="w-full pl-10 pr-4 py-3 bg-slate-700/50 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200"
                         />
                       </div>
                     </div>
@@ -284,7 +305,7 @@ export default function RegisterPage() {
                           required
                           value={formData.email}
                           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                          className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all duration-200"
+                          className="w-full pl-10 pr-4 py-3 bg-slate-700/50 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200"
                         />
                       </div>
                     </div>
@@ -303,7 +324,7 @@ export default function RegisterPage() {
                           minLength={8}
                           value={formData.password}
                           onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                          className="w-full pl-10 pr-12 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all duration-200"
+                          className="w-full pl-10 pr-12 py-3 bg-slate-700/50 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200"
                         />
                         <button
                           type="button"
@@ -313,7 +334,7 @@ export default function RegisterPage() {
                           {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                         </button>
                       </div>
-                      <p className="text-xs text-white/60 mt-1">
+                      <p className="text-xs text-slate-400 mt-1">
                         Usa mayúsculas, minúsculas, números y símbolos
                       </p>
                     </div>
@@ -325,7 +346,7 @@ export default function RegisterPage() {
                     <button
                       type="button"
                       onClick={() => setStep(1)}
-                      className="flex-1 py-3 px-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-200"
+                      className="flex-1 py-3 px-4 bg-slate-700/50 backdrop-blur-sm text-white font-semibold rounded-xl border border-slate-600 hover:bg-slate-700/70 transition-all duration-200"
                     >
                       Anterior
                     </button>
@@ -334,7 +355,7 @@ export default function RegisterPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className={`flex-1 py-3 px-4 bg-gradient-to-r from-white/20 to-white/10 backdrop-blur-sm text-white font-semibold rounded-xl border border-white/20 hover:from-white/30 hover:to-white/20 transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center space-x-2 ${
+                    className={`flex-1 py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl border border-slate-700 transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center space-x-2 ${
                       loading ? 'opacity-50 cursor-not-allowed' : ''
                     }`}
                   >
@@ -354,7 +375,7 @@ export default function RegisterPage() {
               </form>
 
               <div className="mt-8 text-center">
-                <p className="text-white/80">
+                <p className="text-slate-300">
                   ¿Ya tienes cuenta?{' '}
                   <Link 
                     href="/login" 
@@ -364,58 +385,107 @@ export default function RegisterPage() {
                   </Link>
                 </p>
               </div>
-            </div>
-          </div>
 
-          {/* Right Panel - Benefits */}
-          <div className="order-1 lg:order-2 flex items-center">
-            <div className="w-full">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6">
-                Únete a la revolución de la nómina inteligente
-              </h2>
-              <p className="text-lg sm:text-xl text-white/80 mb-8">
-                Más de 5,000 empresas confían en nosotros para procesar su nómina de forma eficiente y cumplir con todas las regulaciones.
-              </p>
-
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0" />
-                  <p className="text-white/90">Configuración en menos de 5 minutos</p>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0" />
-                  <p className="text-white/90">Cálculos automáticos según legislación local</p>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0" />
-                  <p className="text-white/90">Integración bancaria para pagos instantáneos</p>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0" />
-                  <p className="text-white/90">Reportes y analytics en tiempo real</p>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0" />
-                  <p className="text-white/90">Soporte 24/7 con expertos en nómina</p>
-                </div>
-              </div>
-
-              <div className="mt-12 p-6 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20">
-                <div className="flex items-center space-x-4 mb-4">
-                  <Sparkles className="h-8 w-8 text-yellow-400" />
-                  <h3 className="text-xl font-semibold text-white">Oferta de lanzamiento</h3>
-                </div>
-                <p className="text-white/90 mb-2">
-                  <span className="text-2xl font-bold">30 días gratis</span> sin compromiso
-                </p>
-                <p className="text-sm text-white/70">
-                  No se requiere tarjeta de crédito. Cancela cuando quieras.
+              <div className="mt-6 pt-6 border-t border-slate-700">
+                <p className="text-xs text-center text-slate-400">
+                  Al registrarte, aceptas nuestros{' '}
+                  <a href="#" className="underline hover:text-slate-300">Términos de servicio</a>
+                  {' '}y{' '}
+                  <a href="#" className="underline hover:text-slate-300">Política de privacidad</a>
                 </p>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Right Panel - Features */}
+        <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-8">
+          <div className="max-w-lg">
+            <h2 className="text-4xl font-bold text-white mb-6">
+              Gestiona tu nómina con inteligencia artificial
+            </h2>
+            <p className="text-xl text-white/80 mb-8">
+              Plataforma líder en Latinoamérica para gestión de nómina multi-país con compliance automático.
+            </p>
+
+            <div className="space-y-6">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-slate-700 border border-slate-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-1">Setup Automático</h3>
+                  <p className="text-slate-300">Tu empresa lista en menos de 5 minutos</p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-slate-700 border border-slate-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Activity className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-1">Compliance Automático</h3>
+                  <p className="text-slate-300">Siempre actualizado con regulaciones locales</p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-slate-700 border border-slate-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <BarChart3 className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-1">Analytics Avanzados</h3>
+                  <p className="text-slate-300">Reportes y métricas en tiempo real</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-12 flex items-center space-x-8">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-white">5K+</div>
+                <div className="text-sm text-slate-400">Empresas activas</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-white">30</div>
+                <div className="text-sm text-slate-400">Días gratis</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-white">24/7</div>
+                <div className="text-sm text-slate-400">Soporte dedicado</div>
+              </div>
+            </div>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <style jsx>{`
+        .particle {
+          position: absolute;
+          width: 4px;
+          height: 4px;
+          background: rgba(148, 163, 184, 0.3);
+          border-radius: 50%;
+          animation: float-up 15s linear infinite;
+        }
+
+        @keyframes float-up {
+          0% {
+            transform: translateY(100vh) translateX(0);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          90% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(-100vh) translateX(100px);
+            opacity: 0;
+          }
+        }
+      `}</style>
     </div>
   )
 }
