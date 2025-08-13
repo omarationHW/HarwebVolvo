@@ -1,14 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Performance optimizations
-  swcMinify: true,
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
   
   // Bundle analyzer
   experimental: {
-    bundlePagesRouterDependencies: true,
     optimizePackageImports: [
       'lucide-react',
       '@prisma/client',
