@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     // Get user profile from database
     const { data: profile, error: profileError } = await supabase
       .from('users')
-      .select('id, email, name, role, organizationId, workOrderId')
+      .select('id, email, name, role, organizationId')
       .eq('email', email)
       .single()
 
@@ -65,8 +65,7 @@ export async function POST(request: NextRequest) {
         email: profile.email,
         name: profile.name,
         role: profile.role,
-        organizationId: profile.organizationId,
-        workOrderId: profile.workOrderId
+        organizationId: profile.organizationId
       },
       session: data.session
     })

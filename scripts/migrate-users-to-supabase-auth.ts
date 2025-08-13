@@ -39,8 +39,7 @@ async function migrateUsersToSupabaseAuth() {
           user_metadata: {
             name: user.name,
             role: user.role,
-            organizationId: user.organizationId,
-            workOrderId: user.workOrderId
+            organizationId: user.organizationId
           }
         })
         
