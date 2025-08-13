@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { findUserByEmail } from '@/lib/db-direct'
-import { comparePassword, generateToken } from '@/utils/auth'
+import { createClient } from '@/utils/supabase/server'
 import { z } from 'zod'
 
 const loginSchema = z.object({
@@ -15,63 +14,64 @@ export async function POST(request: NextRequest) {
 
     console.log('🔍 Login attempt for:', email)
 
-    // Find user by email using direct PostgreSQL connection
-    const user = await findUserByEmail(email)
+    // Create Supabase client
+    const supabase = await createClient()
 
-    if (!user) {
-      console.log('❌ User not found:', email)
-      return NextResponse.json(
-        { error: 'Invalid credentials' },
-        { status: 401 }
-      )
-    }
-
-    console.log('✅ User found:', user.email, 'Role:', user.role)
-
-    // Verify password
-    const isValidPassword = await comparePassword(password, user.password)
-    if (!isValidPassword) {
-      console.log('❌ Invalid password for:', email)
-      return NextResponse.json(
-        { error: 'Invalid credentials' },
-        { status: 401 }
-      )
-    }
-
-    console.log('✅ Password verified for:', email)
-
-    // Generate JWT token
-    const token = generateToken({
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      role: user.role,
-      organizationId: user.organization_id || undefined,
-      workOrderId: user.work_order_id || undefined
+    // Sign in with Supabase Auth
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     })
 
-    console.log('✅ Token generated, length:', token.length)
+    if (error) {
+      console.log('❌ Login error:', error.message)
+      return NextResponse.json(
+        { error: 'Invalid credentials' },
+        { status: 401 }
+      )
+    }
 
+    if (!data.user) {
+      console.log('❌ No user data returned')
+      return NextResponse.json(
+        { error: 'Invalid credentials' },
+        { status: 401 }
+      )
+    }
+
+    console.log('✅ User authenticated:', data.user.email)
+
+    // Get user profile from database
+    const { data: profile, error: profileError } = await supabase
+      .from('users')
+      .select('id, email, name, role, organizationId, workOrderId')
+      .eq('email', email)
+      .single()
+
+    if (profileError || !profile) {
+      console.log('❌ Profile not found:', profileError)
+      return NextResponse.json(
+        { error: 'User profile not found' },
+        { status: 404 }
+      )
+    }
+
+    console.log('✅ Profile found:', profile.email, 'Role:', profile.role)
+
+    // Return user data and session
     const response = NextResponse.json({
-      token,
       user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        organization: null
-      }
+        id: profile.id,
+        email: profile.email,
+        name: profile.name,
+        role: profile.role,
+        organizationId: profile.organizationId,
+        workOrderId: profile.workOrderId
+      },
+      session: data.session
     })
 
-    // Set cookie for server-side authentication
-    response.cookies.set('auth-token', token, {
-      httpOnly: false, // Disable httpOnly for testing
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7 // 7 days
-    })
-
-    console.log('✅ Cookie set, redirecting to dashboard')
+    console.log('✅ Login successful, session created')
 
     return response
   } catch (error) {

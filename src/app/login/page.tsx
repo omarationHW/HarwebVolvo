@@ -65,8 +65,7 @@ export default function LoginPage() {
         throw new Error(data.error || 'Error al iniciar sesión')
       }
 
-      // Save token to localStorage
-      localStorage.setItem('token', data.token)
+      // Save user data to localStorage (Supabase handles session cookies)
       localStorage.setItem('user', JSON.stringify(data.user))
 
       // Redirect to dashboard
