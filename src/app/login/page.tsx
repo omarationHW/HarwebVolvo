@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Header from '@/components/layout/Header'
 import { 
   Mail, 
   Lock, 
@@ -12,7 +13,8 @@ import {
   Sparkles,
   Shield,
   Zap,
-  Globe
+  Globe,
+  CheckCircle
 } from 'lucide-react'
 
 export default function LoginPage() {
@@ -78,9 +80,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-slate-900">
-      {/* Subtle gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <Header />
       
       {/* Animated Background */}
       <div className="bg-animation absolute inset-0">
@@ -97,16 +98,10 @@ export default function LoginPage() {
       }} />
 
       {/* Content */}
-      <div className="relative min-h-screen flex">
+      <div className="relative min-h-screen flex pt-20">
         {/* Left Panel - Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
           <div className="w-full max-w-md">
-            {/* Logo */}
-            <div className="flex items-center justify-center mb-8">
-              <div className="w-16 h-16 bg-slate-800 border border-slate-700 rounded-2xl flex items-center justify-center shadow-2xl">
-                <span className="text-3xl font-bold text-white">H</span>
-              </div>
-            </div>
 
             {/* Form Container */}
             <div className="bg-slate-800/80 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-slate-700">

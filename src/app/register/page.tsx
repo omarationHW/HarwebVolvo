@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Header from '@/components/layout/Header'
 import { 
   Building2, 
   Globe, 
@@ -101,6 +102,8 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-indigo-600 via-purple-700 to-pink-600">
+      <Header />
+      
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
@@ -114,19 +117,10 @@ export default function RegisterPage() {
       }} />
 
       {/* Content */}
-      <div className="relative min-h-screen flex items-center justify-center p-4 sm:p-8">
+      <div className="relative min-h-screen flex items-center justify-center p-4 sm:p-8 pt-24">
         <div className="w-full max-w-5xl grid lg:grid-cols-2 gap-8 lg:gap-12">
           {/* Left Panel - Form */}
           <div className="order-2 lg:order-1">
-            {/* Logo */}
-            <div className="flex items-center justify-center lg:justify-start mb-8">
-              <Link href="/" className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-white/20 backdrop-blur-lg rounded-xl flex items-center justify-center shadow-xl">
-                  <span className="text-2xl font-bold text-white">H</span>
-                </div>
-                <span className="text-2xl font-bold text-white">Harweb DBO</span>
-              </Link>
-            </div>
 
             {/* Form Container */}
             <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/20">
