@@ -17,11 +17,43 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Harweb Volvo - Sistema de Gestión",
+  title: "HarwebDBO - Volvo",
   description: "Sistema de gestión de órdenes de trabajo y nómina",
   keywords: "harweb, volvo, gestión, órdenes de trabajo, nómina",
   viewport: "width=device-width, initial-scale=1",
   themeColor: "#1e293b",
+  manifest: "/manifest.json",
+  icons: {
+    icon: [
+      {
+        url: "/icon-192b.png",
+        sizes: "192x192",
+        type: "image/png",
+      },
+      {
+        url: "/icon-192b.png",
+        sizes: "32x32",
+        type: "image/png",
+      },
+      {
+        url: "/icon-192b.png",
+        sizes: "16x16",
+        type: "image/png",
+      }
+    ],
+    apple: [
+      {
+        url: "/icon-192b.png",
+        sizes: "180x180",
+        type: "image/png",
+      }
+    ],
+    shortcut: "/icon-192b.png"
+  },
+  other: {
+    "msapplication-TileColor": "#1e293b",
+    "msapplication-TileImage": "/icon-192b.png"
+  }
 };
 
 export default function RootLayout({

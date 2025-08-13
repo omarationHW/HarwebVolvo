@@ -1,0 +1,24 @@
+{
+  "name": "HarwebDBO - Volvo",
+  "short_name": "HarwebDBO",
+  "description": "Sistema de gestión de órdenes de trabajo y nómina",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1e293b",
+  "theme_color": "#1e293b",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192b.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icon-192b.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ]
+}
