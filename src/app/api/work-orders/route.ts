@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { withCache } from '@/utils/cache'
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,17 +14,22 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const workOrder = await prisma.workOrder.findUnique({
-      where: { id: workOrderId },
-      include: {
-        _count: {
-          select: {
-            employees: true,
-            payrollRuns: true
+    // Cache work order data for 5 minutes
+    const workOrder = await withCache(
+      `work-order-${workOrderId}`,
+      () => prisma.workOrder.findUnique({
+        where: { id: workOrderId },
+        include: {
+          _count: {
+            select: {
+              employees: true,
+              payrollRuns: true
+            }
           }
         }
-      }
-    })
+      }),
+      5
+    )
 
     if (!workOrder) {
       return NextResponse.json(
@@ -32,7 +38,9 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    return NextResponse.json(workOrder)
+    const response = NextResponse.json(workOrder)
+    response.headers.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=60')
+    return response
   } catch (error) {
     console.error('Get work order error:', error)
     return NextResponse.json(

@@ -159,17 +159,17 @@ export default function DashboardLayout({
       <div className={`${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       } lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-50 ${
-        sidebarCollapsed ? 'w-20' : 'w-72'
+        sidebarCollapsed ? 'w-[88px]' : 'w-72'
       } bg-white border-r border-slate-200 transition-all duration-300 ease-in-out flex flex-col`}>
         
         {/* Logo Section */}
-        <div className="flex-shrink-0 p-6 border-b border-slate-200">
+        <div className={`flex-shrink-0 ${sidebarCollapsed ? 'p-4' : 'p-6'} border-b border-slate-200`}>
           <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'space-x-3'}`}>
-            <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center flex-shrink-0">
+            <div className={`${sidebarCollapsed ? 'w-12 h-12' : 'w-10 h-10'} bg-slate-900 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300`}>
               <span className="text-white font-bold text-lg">H</span>
             </div>
             {!sidebarCollapsed && (
-              <div className="min-w-0 flex-1">
+              <div className="min-w-0 flex-1 overflow-hidden">
                 <h2 className="text-xl font-bold text-slate-900 truncate">
                   Harweb DBO
                 </h2>
@@ -180,7 +180,7 @@ export default function DashboardLayout({
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-6 space-y-8 overflow-y-auto">
+        <nav className={`flex-1 ${sidebarCollapsed ? 'px-4 py-6' : 'p-6'} space-y-8 overflow-y-auto overflow-x-hidden`}>
           {/* Main Navigation */}
           <div>
             {!sidebarCollapsed && (
@@ -195,7 +195,7 @@ export default function DashboardLayout({
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                    className={`group flex items-center ${sidebarCollapsed ? 'justify-center px-3 py-3' : 'px-3 py-2'} text-sm font-medium rounded-lg transition-all duration-200 ${
                       isActive 
                         ? 'bg-slate-900 text-white' 
                         : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
@@ -203,11 +203,11 @@ export default function DashboardLayout({
                     onClick={() => setSidebarOpen(false)}
                     title={sidebarCollapsed ? item.name : undefined}
                   >
-                    <item.icon className={`flex-shrink-0 h-5 w-5 ${
+                    <item.icon className={`flex-shrink-0 ${sidebarCollapsed ? 'h-6 w-6' : 'h-5 w-5'} ${
                       isActive ? 'text-white' : 'text-slate-500 group-hover:text-slate-700'
-                    }`} />
+                    } transition-all duration-300`} />
                     {!sidebarCollapsed && (
-                      <div className="ml-3 min-w-0 flex-1">
+                      <div className="ml-3 min-w-0 flex-1 overflow-hidden">
                         <div className="truncate">{item.name}</div>
                         <div className={`text-xs mt-0.5 truncate ${
                           isActive ? 'text-white/70' : 'text-slate-500'
@@ -217,7 +217,7 @@ export default function DashboardLayout({
                       </div>
                     )}
                     {isActive && !sidebarCollapsed && (
-                      <div className="ml-auto">
+                      <div className="ml-auto flex-shrink-0">
                         <div className="w-2 h-2 bg-white rounded-full"></div>
                       </div>
                     )}
@@ -241,7 +241,7 @@ export default function DashboardLayout({
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                    className={`group flex items-center ${sidebarCollapsed ? 'justify-center px-3 py-3' : 'px-3 py-2'} text-sm font-medium rounded-lg transition-all duration-200 ${
                       isActive 
                         ? 'bg-slate-900 text-white' 
                         : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
@@ -249,11 +249,11 @@ export default function DashboardLayout({
                     onClick={() => setSidebarOpen(false)}
                     title={sidebarCollapsed ? item.name : undefined}
                   >
-                    <item.icon className={`flex-shrink-0 h-5 w-5 ${
+                    <item.icon className={`flex-shrink-0 ${sidebarCollapsed ? 'h-6 w-6' : 'h-5 w-5'} ${
                       isActive ? 'text-white' : 'text-slate-500 group-hover:text-slate-700'
-                    }`} />
+                    } transition-all duration-300`} />
                     {!sidebarCollapsed && (
-                      <div className="ml-3 min-w-0 flex-1">
+                      <div className="ml-3 min-w-0 flex-1 overflow-hidden">
                         <div className="truncate">{item.name}</div>
                         <div className={`text-xs mt-0.5 truncate ${
                           isActive ? 'text-white/70' : 'text-slate-500'
@@ -263,7 +263,7 @@ export default function DashboardLayout({
                       </div>
                     )}
                     {isActive && !sidebarCollapsed && (
-                      <div className="ml-auto">
+                      <div className="ml-auto flex-shrink-0">
                         <div className="w-2 h-2 bg-white rounded-full"></div>
                       </div>
                     )}
@@ -294,7 +294,7 @@ export default function DashboardLayout({
         </nav>
 
         {/* User Profile */}
-        <div className="flex-shrink-0 p-6 border-t border-slate-200">
+        <div className={`flex-shrink-0 ${sidebarCollapsed ? 'p-4' : 'p-6'} border-t border-slate-200`}>
           {!sidebarCollapsed ? (
             <div className="space-y-4">
               <div className="flex items-center space-x-3">
